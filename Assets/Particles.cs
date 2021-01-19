@@ -11,6 +11,10 @@ public class Particles : MonoBehaviour {
     private int PARTICLE_SIZE = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Particle));
 
     public int particleCount = 1000;
+    
+    [Range(1, 15)]
+    public float radius = 1.0f;
+
     public Material particleMaterial;
 
     private Particle[] particles;
@@ -20,9 +24,7 @@ public class Particles : MonoBehaviour {
         particles = new Particle[particleCount];
         
         for (int i = 0; i < particleCount; ++i) {
-            particles[i].position = new Vector3(Random.Range(-1.0f, 1.0f), 
-                                                Random.Range(-1.0f, 1.0f), 
-                                                Random.Range(-1.0f, 1.0f));
+            particles[i].position = Random.insideUnitSphere * radius;
         }
 
         particleBuffer = new ComputeBuffer(particleCount, PARTICLE_SIZE);
@@ -30,6 +32,14 @@ public class Particles : MonoBehaviour {
 
         particleMaterial.SetBuffer("particleBuffer", particleBuffer);
     }
+
+    private void Update() {
+        for (int i = 0; i < particleCount; ++i) {
+            particles[i].position = Random.insideUnitSphere * radius;
+        }
+
+        particleBuffer.SetData(particles);
+        }
 
     private void OnDestroy() {
         if (particleBuffer != null) particleBuffer.Release();
