@@ -19,9 +19,16 @@
                 float4 vertex : SV_POSITION;
             };
 
-            v2f vert (appdata v) {
+            struct Particle {
+                float3 position;
+            };
+
+            StructuredBuffer<Particle> particleBuffer;
+
+            v2f vert (appdata v, uint instance_id : SV_InstanceID) {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.vertex = UnityObjectToClipPos(float4(particleBuffer[instance_id].position, 1.0f));
+                
                 return o;
             }
 
@@ -30,7 +37,7 @@
             fixed4 frag (v2f f) : SV_Target {
                 return 1;
             }
-            
+
             ENDCG
         }
     }
