@@ -1,0 +1,14 @@
+﻿#pragma kernel InitializeParticles
+
+struct Particle {
+    float3 position;
+};
+
+RWStructuredBuffer<Particle> _ParticlesBuffer;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID) {
+    // TODO: insert actual code here!
+
+    _ParticlesBuffer[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}

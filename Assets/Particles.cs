@@ -24,6 +24,7 @@ public class Particles : MonoBehaviour {
     private int dimension;
 
     public Material particleMaterial;
+    public ComputeShader particleCompute;
 
     private Particle[] particles;
     private ComputeBuffer particleBuffer;
@@ -36,9 +37,9 @@ public class Particles : MonoBehaviour {
         particles = new Particle[particleCount];
         
         for (int i = 0, z = 0; z < dimension; ++z) {
-            float v = (z + 0.5f) * (2.0f / particleCount) * radius;
+            float v = z * (2.0f / particleCount) * radius;
             for (int x = 0; x < dimension; ++x, ++i) {
-                float u = (x + 0.5f) * (2.0f / particleCount) * radius;
+                float u = x * (2.0f / particleCount) * radius;
                 particles[i].position = new Vector3(u, 0, v);
                 }
         }
@@ -50,14 +51,20 @@ public class Particles : MonoBehaviour {
     }
 
     private void Update() {
+        float time = Time.time;
         for (int i = 0, z = 0; z < dimension; ++z) {
-            float v = (z + 0.5f) * (2.0f / particleCount) * radius;
+            float v = z * (2.0f / particleCount) * radius;
             for (int x = 0; x < dimension; ++x, ++i) {
-                float u = (x + 0.5f) * (2.0f / particleCount) * radius;
-                particles[i].position.x = u;
-                particles[i].position.y = Mathf.Sin(Mathf.PI * (u + Time.time) * wavelength) * amplitude;
-                particles[i].position.y += Mathf.Sin(Mathf.PI * (v + Time.time) * wavelength) * amplitude;
-                particles[i].position.z = v;
+                float u = x * (2.0f / particleCount) * radius;
+                Vector3 pos = particles[i].position;
+
+                pos.x = u;
+                pos.z = v;
+                pos.y = u * Mathf.Sin((1 / u) * time * wavelength) * amplitude;
+                pos.y += v * Mathf.Sin((1 / v) * time * wavelength) * amplitude;
+                pos.y += pos.y * Mathf.Sin((1 / pos.y) * time * wavelength) * amplitude;
+
+                particles[i].position = pos;
                 }
         }
 
