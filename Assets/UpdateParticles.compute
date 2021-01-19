@@ -1,4 +1,6 @@
-﻿#pragma kernel InitializeParticles
+﻿#pragma kernel UpdateParticles
+
+#define EPSILON 0.00000001
 
 struct Particle {
     float3 position;
@@ -6,15 +8,18 @@ struct Particle {
 
 RWStructuredBuffer<Particle> _ParticlesBuffer;
 
-float _GraphScaling;
-int _Dimension;
-float _Size;
+float _GraphScaling, _Size, _Time, _Wavelength, _Amplitude;
+uint _Dimension;
 
 [numthreads(8,8,1)]
-void InitializeParticles(uint3 id : SV_DispatchThreadID) {
+void UpdateParticles(uint3 id : SV_DispatchThreadID) {
     if (id.x < _Dimension && id.y < _Dimension) {
         float3 pos = 0;
         pos.xz = id.xy * _GraphScaling * _Size;
+        pos.y = pos.x * sin((1 / (pos.x + EPSILON)) * _Time * _Wavelength) * _Amplitude;
+        pos.y += pos.z * sin((1 / (pos.z + EPSILON)) * _Time * _Wavelength) * _Amplitude;
+        pos.y += pos.y * sin((1 / (pos.y + EPSILON)) * _Time * _Wavelength) * _Amplitude;
+
         _ParticlesBuffer[id.x + id.y * _Dimension].position = pos;
     }
 }

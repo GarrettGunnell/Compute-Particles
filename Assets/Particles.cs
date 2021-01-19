@@ -38,6 +38,9 @@ public class Particles : MonoBehaviour {
         particleBuffer.SetData(particles);
         if (useGPU) {
             particleCompute.SetFloat("_GraphScaling", 2.0f / particleCount);
+            particleCompute.SetFloat("_Time", Time.time);
+            particleCompute.SetFloat("_Wavelength", wavelength);
+            particleCompute.SetFloat("_Amplitude", amplitude);
             particleCompute.SetInt("_Dimension", dimension);
             particleCompute.SetFloat("_Size", radius);
             particleCompute.SetBuffer(0, "_ParticlesBuffer", particleBuffer);
@@ -59,10 +62,15 @@ public class Particles : MonoBehaviour {
     }
 
     private void Update() {
-        float time = Time.time;
         if (useGPU) {
-
+            particleCompute.SetFloat("_Time", Time.time);
+            particleCompute.SetFloat("_Wavelength", wavelength);
+            particleCompute.SetFloat("_Amplitude", amplitude);
+            particleCompute.SetFloat("_Size", radius);
+            particleCompute.Dispatch(0, Mathf.CeilToInt(dimension / 8.0f), Mathf.CeilToInt(dimension / 8.0f), 1);
         } else {
+            float time = Time.time;
+
             for (int i = 0, z = 0; z < dimension; ++z) {
                 float v = z * (2.0f / particleCount) * radius;
                 for (int x = 0; x < dimension; ++x, ++i) {
