@@ -6,9 +6,15 @@ struct Particle {
 
 RWStructuredBuffer<Particle> _ParticlesBuffer;
 
-[numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID) {
-    // TODO: insert actual code here!
+float _GraphScaling;
+int _Dimension;
+float _Size;
 
-    _ParticlesBuffer[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+[numthreads(8,8,1)]
+void InitializeParticles(uint3 id : SV_DispatchThreadID) {
+    if (id.x < _Dimension && id.y < _Dimension) {
+        float3 pos = 0;
+        pos.xz = id.xy * _GraphScaling * _Size;
+        _ParticlesBuffer[id.x + id.y * _Dimension].position = pos;
+    }
 }

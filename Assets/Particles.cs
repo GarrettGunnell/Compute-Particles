@@ -25,51 +25,63 @@ public class Particles : MonoBehaviour {
 
     public Material particleMaterial;
     public ComputeShader particleCompute;
+    public bool useGPU = false;
 
     private Particle[] particles;
     private ComputeBuffer particleBuffer;
 
     private void Start() {
         dimension = Mathf.FloorToInt(Mathf.Sqrt(particleCount));
-        if (dimension < Mathf.Sqrt(particleCount))
-            particleCount -= 1;
         
         particles = new Particle[particleCount];
-        
-        for (int i = 0, z = 0; z < dimension; ++z) {
-            float v = z * (2.0f / particleCount) * radius;
-            for (int x = 0; x < dimension; ++x, ++i) {
-                float u = x * (2.0f / particleCount) * radius;
-                particles[i].position = new Vector3(u, 0, v);
-                }
-        }
-
         particleBuffer = new ComputeBuffer(particleCount, PARTICLE_SIZE);
         particleBuffer.SetData(particles);
+        if (useGPU) {
+            particleCompute.SetFloat("_GraphScaling", 2.0f / particleCount);
+            particleCompute.SetInt("_Dimension", dimension);
+            particleCompute.SetFloat("_Size", radius);
+            particleCompute.SetBuffer(0, "_ParticlesBuffer", particleBuffer);
+            particleCompute.Dispatch(0, Mathf.CeilToInt(dimension / 8.0f), Mathf.CeilToInt(dimension / 8.0f), 1);
+        } else {
+            
+            for (int i = 0, z = 0; z < dimension; ++z) {
+                float v = z * (2.0f / particleCount) * radius;
+                for (int x = 0; x < dimension; ++x, ++i) {
+                    float u = x * (2.0f / particleCount) * radius;
+                    particles[i].position = new Vector3(u, 0, v);
+                }
+            }
+
+            particleBuffer.SetData(particles);
+        }
 
         particleMaterial.SetBuffer("particleBuffer", particleBuffer);
     }
 
     private void Update() {
         float time = Time.time;
-        for (int i = 0, z = 0; z < dimension; ++z) {
-            float v = z * (2.0f / particleCount) * radius;
-            for (int x = 0; x < dimension; ++x, ++i) {
-                float u = x * (2.0f / particleCount) * radius;
-                Vector3 pos = particles[i].position;
+        if (useGPU) {
 
-                pos.x = u;
-                pos.z = v;
-                pos.y = u * Mathf.Sin((1 / u) * time * wavelength) * amplitude;
-                pos.y += v * Mathf.Sin((1 / v) * time * wavelength) * amplitude;
-                pos.y += pos.y * Mathf.Sin((1 / pos.y) * time * wavelength) * amplitude;
+        } else {
+            for (int i = 0, z = 0; z < dimension; ++z) {
+                float v = z * (2.0f / particleCount) * radius;
+                for (int x = 0; x < dimension; ++x, ++i) {
+                    float u = x * (2.0f / particleCount) * radius;
+                    Vector3 pos = particles[i].position;
 
-                particles[i].position = pos;
+                    pos.x = u;
+                    pos.z = v;
+                    pos.y = u * Mathf.Sin((1 / u) * time * wavelength) * amplitude;
+                    pos.y += v * Mathf.Sin((1 / v) * time * wavelength) * amplitude;
+                    pos.y += pos.y * Mathf.Sin((1 / pos.y) * time * wavelength) * amplitude;
+
+                    particles[i].position = pos;
                 }
-        }
+            }
 
-        particleBuffer.SetData(particles);
+            particleBuffer.SetData(particles);
         }
+    }
 
     private void OnDestroy() {
         if (particleBuffer != null) particleBuffer.Release();
