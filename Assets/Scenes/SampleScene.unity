@@ -274,6 +274,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f174b4f4b5058dd45abd886a0a9084a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleCount: 10
+  radius: 6.28
+  particleMaterial: {fileID: 2100000, guid: 3b83b98993a84394fac1e49533700dfc, type: 2}
 --- !u!4 &2142957474
 Transform:
   m_ObjectHideFlags: 0
