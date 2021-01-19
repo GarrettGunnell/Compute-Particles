@@ -53,6 +53,7 @@ public class Particles : MonoBehaviour {
                     float u = x * (2.0f / particleCount) * radius;
                     particles[i].position = new Vector3(u, 0, v);
                 }
+                Debug.Log((2.0f / particleCount) * radius * dimension);
             }
 
             particleBuffer.SetData(particles);
@@ -96,6 +97,8 @@ public class Particles : MonoBehaviour {
     }
 
     private void OnRenderObject() {
+        particleMaterial.SetFloat("_Amplitude", amplitude);
+        particleMaterial.SetFloat("_Dimension", (2.0f / particleCount) * radius * dimension);
         particleMaterial.SetPass(0);
         Graphics.DrawProceduralNow(MeshTopology.Points, 1, particleCount);
     }
