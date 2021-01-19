@@ -274,13 +274,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f174b4f4b5058dd45abd886a0a9084a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particleCount: 5000000
+  particleCount: 400000
   radius: 1000
-  amplitude: 0.5
-  wavelength: 0.5
+  amplitude: 0.2
+  wavelength: 0.3
   particleMaterial: {fileID: 2100000, guid: 3b83b98993a84394fac1e49533700dfc, type: 2}
   particleCompute: {fileID: 7200000, guid: 1efa3dc2cf0da4e438b1a6c40ad83d2f, type: 3}
-  useGPU: 1
+  useGPU: 0
 --- !u!4 &2142957474
 Transform:
   m_ObjectHideFlags: 0

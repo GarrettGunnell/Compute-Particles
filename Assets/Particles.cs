@@ -46,14 +46,12 @@ public class Particles : MonoBehaviour {
             particleCompute.SetBuffer(0, "_ParticlesBuffer", particleBuffer);
             particleCompute.Dispatch(0, Mathf.CeilToInt(dimension / 8.0f), Mathf.CeilToInt(dimension / 8.0f), 1);
         } else {
-            
             for (int i = 0, z = 0; z < dimension; ++z) {
                 float v = z * (2.0f / particleCount) * radius;
                 for (int x = 0; x < dimension; ++x, ++i) {
                     float u = x * (2.0f / particleCount) * radius;
                     particles[i].position = new Vector3(u, 0, v);
                 }
-                Debug.Log((2.0f / particleCount) * radius * dimension);
             }
 
             particleBuffer.SetData(particles);
