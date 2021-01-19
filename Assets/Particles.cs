@@ -11,10 +11,17 @@ public class Particles : MonoBehaviour {
     private int PARTICLE_SIZE = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Particle));
 
     public int particleCount = 1000;
-    private int dimension;
-    
+
     [Range(1, 10000)]
     public float radius = 1.0f;
+
+    [Range(0.01f, 3f)]
+    public float amplitude = 1.0f;
+    
+    [Range(0.01f, 3f)]
+    public float wavelength = 1.0f;
+
+    private int dimension;
 
     public Material particleMaterial;
 
@@ -47,7 +54,10 @@ public class Particles : MonoBehaviour {
             float v = (z + 0.5f) * (2.0f / particleCount) * radius;
             for (int x = 0; x < dimension; ++x, ++i) {
                 float u = (x + 0.5f) * (2.0f / particleCount) * radius;
-                particles[i].position = new Vector3(u, 0, v);
+                particles[i].position.x = u;
+                particles[i].position.y = Mathf.Sin(Mathf.PI * (u + Time.time) * wavelength) * amplitude;
+                particles[i].position.y += Mathf.Sin(Mathf.PI * (v + Time.time) * wavelength) * amplitude;
+                particles[i].position.z = v;
                 }
         }
 
